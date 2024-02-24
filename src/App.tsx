@@ -1,35 +1,66 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { FormEvent } from 'react';
+import './App.css';
+import { gql, useLazyQuery } from '@apollo/client';
+import FindRepoForm from './components/FindRepoForm';
+import IssueList from './components/IssueList';
+
+const GET_ISSUES = gql`
+	query GetRepositoryIssues($name: String!, $owner: String!) {
+		repository(name: $name, owner: $owner) {
+			id
+			name
+			nameWithOwner
+			issues(last: 10) {
+				totalCount
+				nodes {
+					id
+					bodyText
+					author {
+						login
+					}
+					comments {
+						totalCount
+					}
+				}
+			}
+		}
+	}
+`;
 
 function App() {
-  const [count, setCount] = useState(0)
+	
+	const [fetchUser, { data, loading, error }] = useLazyQuery(GET_ISSUES);
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+	const submitHandler = (event: FormEvent, name: string, owner: string) => {
+		event.preventDefault();
+		fetchUser({ variables: { name: name, owner: owner } });
+	};
+
+	
+
+	return (
+		<>
+			<FindRepoForm submitHandler={submitHandler} />
+			{loading && <h2>Loading</h2>}
+			{error && <h2>Error</h2>}
+			{data && (
+				<>
+					<h2>Repo Name: {data.repository.name}</h2>
+					{data.repository.issues.totalCount > 0 ? (
+						<>
+							<h3>
+								Total Issues Count:
+								{data.repository.issues.totalCount}
+							</h3>		
+              <IssueList issues={data.repository.issues} />
+						</>
+					) : (
+						<h2>There is no issues</h2>
+					)}
+				</>
+			)}
+		</>
+	);
 }
 
-export default App
+export default App;
