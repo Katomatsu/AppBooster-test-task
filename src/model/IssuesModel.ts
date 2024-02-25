@@ -1,6 +1,6 @@
 export interface IssueModel {
   id: number;
-	bodyText: string;
+	bodyHTML: JSX.Element;
 	author: {
 		login: string;
 	};

@@ -12,8 +12,9 @@ const IssueList = ({ issues }: IssueListProps) => {
 				return (
 					<IssueItem
 						login={item.author.login}
-						bodyText={item.bodyText}
+						bodyHTML={item.bodyHTML}
 						key={item.id}
+            id={item.id}
             commentsAmount={item.comments.totalCount}
 					/>
 				);
