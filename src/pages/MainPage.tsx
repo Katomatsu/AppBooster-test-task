@@ -1,7 +1,7 @@
 
 import { gql, useLazyQuery } from '@apollo/client';
-import FindRepoForm from '../components/FindRepoForm'
-import IssueList from '../components/IssueList'
+import FindRepoForm from '../components/FindRepoForm/FindRepoForm'
+import IssueList from '../components/Issues/IssueList'
 import { FormEvent } from 'react';
 
 
@@ -17,7 +17,12 @@ const GET_ISSUES = gql`
 				totalCount
 				nodes {
 					id
+          titleHTML
 					bodyHTML
+          number
+          state
+          closedAt
+          createdAt
 					author {
 						login
 					}

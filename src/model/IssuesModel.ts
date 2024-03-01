@@ -1,15 +1,26 @@
 export interface IssueModel {
-  id: number;
+	id: string;
 	bodyHTML: JSX.Element;
+	titleHTML: JSX.Element;
+	number: number;
+  state: 'OPEN' | 'CLOSED'
+  closedAt: string
+  createdAt: string
 	author: {
 		login: string;
 	};
-  comments: {
-    totalCount: number
-  }
+	comments: {
+		totalCount: number;
+		nodes: {
+			bodyHTML: JSX.Element;
+			author: {
+				login: string;
+			};
+		};
+	};
 }
 
 export interface IssuesModel {
-  totalCount: number,
-  nodes: IssueModel[]
+	totalCount: number;
+	nodes: IssueModel[];
 }

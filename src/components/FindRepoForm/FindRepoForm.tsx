@@ -1,5 +1,5 @@
 import { FormEvent, useState } from 'react';
-import Input from './UI/Input';
+import Input from '../UI/Input';
 
 interface FindRepoFormProps {
 	submitHandler: (event: FormEvent, name: string, owner: string) => void;
