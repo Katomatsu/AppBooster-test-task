@@ -1,26 +1,17 @@
-import { gql, useMutation } from '@apollo/client';
+import { ApolloError } from '@apollo/client';
 import { FormEvent, useState } from 'react';
 
-const ADD_COMMENT_TO_FORM = gql`
-	mutation AddCommentToForm($subjectId: ID!, $body: String!) {
-		addComment(input: { subjectId: $subjectId, body: $body }) {
-			commentEdge {
-				node {
-					id
-					body
-				}
-			}
-		}
-	}
-`;
+
 
 interface AddCommentFormProps {
-  issueId: string
+	mutationLoading: boolean;
+	mutationError: ApolloError | undefined;
+	mutationData: string;
+	onAddComment: (body: string, event: FormEvent<HTMLFormElement>) => void;
 }
 
-const AddCommentForm = ({issueId} : AddCommentFormProps) => {
-	const [addComment, { loading, data, error }] =
-		useMutation(ADD_COMMENT_TO_FORM);
+const AddCommentForm = ({ onAddComment, mutationData, mutationError, mutationLoading} : AddCommentFormProps) => {
+	
 
 	const [body, setBody] = useState('');
 
@@ -28,29 +19,18 @@ const AddCommentForm = ({issueId} : AddCommentFormProps) => {
 		setBody(value);
 	};
 
-
-	const addCommentHandler = async (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		try {
-			const { data } = await addComment({
-				variables: {
-					subjectId: issueId,
-					body: body
-				}
-			});
-			console.log('Comment added: ', data);
-		} catch (error) {
-			console.error('Error adding comment:', error);
-		}
-	};
+  const submitHandler = (event: FormEvent<HTMLFormElement>) => {
+		onAddComment(body, event);
+    setBody('')
+  };
 
 	return (
 		<form
-			onSubmit={addCommentHandler}
+			onSubmit={submitHandler}
 			className='flex flex-col w-[100%] mx-auto mt-5 '
 		>
-			{loading && <h2>Loading...</h2>}
-			{error && !loading && <pre>{JSON.stringify(data, null, 2)}</pre>}
+			{mutationLoading && <h2>Loading...</h2>}
+			{mutationError && !mutationLoading && <pre>{JSON.stringify(mutationData)}</pre>}
 
 			<label htmlFor='comment-body' className='font-bold text-left text-xl mb-2'>Add a comment</label>
 			<textarea
@@ -58,11 +38,11 @@ const AddCommentForm = ({issueId} : AddCommentFormProps) => {
 				value={body}
 				placeholder='Add your comment here...'
 				onChange={event => bodyChangeHandler(event.target.value)}
-				className='mb-5 outline-none p-2 bg-[#0d1117] rounded-lg border-[1px] border-[#30363d]'
+				className='mb-5 outline-none p-2 bg-[#0d1117] rounded-lg border-[1px] border-[#30363d] min-h-[70px]'
 			/>
 			<button
 				type='submit'
-				className='bg-[#172554] block mx-auto w-[100px] min-h-[30px]'
+				className='bg-[#172554] block mx-auto w-[100px] min-h-[30px] rounded-lg'
 			>
 				Comment
 			</button>
